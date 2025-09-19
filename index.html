@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@</title>
+<link rel="icon" href="./assets/katana.png" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; overflow: hidden; }
+* { }
+#myVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(12,12,12,0.75); z-index: -1; }
+.container { max-width: 100%; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70vh; position: relative; z-index: 1; }
+
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 5rem;
+  font-weight: 700;
+  margin-bottom: 70px;
+  text-align: center;
+  background: linear-gradient(270deg, #9C1B30, #C52F3D, #E3E3E3, #732C3E, #1E1E1E);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientMove 8s ease infinite, glowPulse 3s ease-in-out infinite;
+  -webkit-text-stroke: 0.8px rgba(0,0,0,0.6);
+  text-shadow: 0 0 10px rgba(227,227,227,0.7), 2px 2px 6px rgba(0,0,0,0.6);
+  letter-spacing: 12px; /* spațiere mai mare între litere */
+}
+
+@keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes glowPulse { 0%,100% { text-shadow:0 0 10px rgba(227,227,227,0.7), 2px 2px 6px rgba(0,0,0,0.6);} 50% { text-shadow:0 0 20px rgba(255,255,255,1), 2px 2 12px rgba(0,0,0,0.8);} }
+
+.social-buttons { margin-top: 20px; }
+.social-buttons a { display: flex; align-items: center; justify-content: center; width: 225px; padding: 15px 20px; margin: 10px auto; background-color: rgba(30,30,30,0.6); color: #E3E3E3; text-decoration: none; border-radius: 10px; transition: background-color 0.3s ease, transform 0.2s ease; border: 2px solid rgba(156,27,48,0.8); backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.6); font-family: 'Poppins', sans-serif; font-weight: 600; }
+.social-buttons a:hover { background-color: rgba(156,27,48,0.9); transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.8); }
+.social-buttons img { margin-right: 6px; height: 20px; }
+
+#enterOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(12, 12, 12, 1); z-index: 5; display:flex; flex-direction: column; align-items:center; justify-content:center; color:#E3E3E3; font-size:2rem; font-weight:bold; text-transform:uppercase; transition: opacity 0.8s ease, transform 0.8s ease; }
+#enterText::after { content: ""; display: inline-block; margin-left: 0.1em; animation: dotsAnim 1.90s steps(4) infinite; }
+@keyframes dotsAnim { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } 100% { content: ""; } }
+#enterOverlay #privacyText { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: rgba(227,227,227,0.4); cursor: pointer; font-family: 'Poppins', sans-serif; user-select: none; transition: color 0.3s ease; }
+#enterOverlay #privacyText:hover { color: rgba(227,227,227,1); }
+
+#privacyPopup { position: fixed; top:50%; left:50%; transform: translate(-50%, -50%); background: #1E1E1E; color: #E3E3E3; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.7); opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; z-index: 1000; }
+#privacyPopup.show { opacity: 1; visibility: visible; }
+#privacyPopup h2 { margin-top:0; margin-bottom:15px; font-size:1.5rem; text-align:center; color:#C52F3D; }
+#privacyPopup h3 { margin-top:20px; font-size:1.1rem; color:#9C1B30; }
+#privacyPopup p { font-size:0.95rem; line-height:1.5; margin-bottom:10px; }
+#privacyPopup .closeBtn { position: absolute; top:10px; right:15px; font-size:2rem; font-weight:bold; color:#E3E3E3; cursor:pointer; background:none; border:none; padding: 5px; }
+#privacyPopup .closeBtn:hover { color:#C52F3D; }
+#privacyPopup::-webkit-scrollbar { width: 8px; }
+#privacyPopup::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+#privacyPopup::-webkit-scrollbar-thumb { background: rgba(156,27,48,0.5); border-radius: 4px; }
+#privacyPopup::-webkit-scrollbar-thumb:hover { background: rgba(197,47,61,0.8); }
+
+#audioPlayer { position: fixed; bottom: 20px; right: 20px; background: rgba(30,30,30,0.7); backdrop-filter: blur(10px); color: #E3E3E3; display: flex; align-items: center; padding: 10px 15px; border-radius: 12px; gap: 10px; z-index: 3; font-family: Arial, sans-serif; width: 280px; min-width: 280px; max-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); border: 1px solid rgba(156,27,48,0.8); display: none; }
+#audioPlayer img { width:50px; height:50px; border-radius:8px; object-fit:cover; }
+#trackTitle { color: #E3E3E3; font-weight: bold; margin-bottom: 4px; overflow: hidden; white-space: nowrap; width: 180px; flex-shrink: 0; }
+#trackTitle span { display: inline-block; padding-left: 100%; animation: marquee 10s linear infinite; animation-play-state: running; }
+@keyframes marquee { from { transform: translateX(0%); } to { transform: translateX(-100%); } }
+#trackSlider { -webkit-appearance:none; width:100%; height:6px; border-radius:3px; background: linear-gradient(90deg, #9C1B30, #C52F3D, #E3E3E3, #732C3E); outline:none; cursor:pointer; }
+#trackSlider::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#9C1B30; border:2px solid #E3E3E3; cursor:pointer; box-shadow:0 0 4px rgba(0,0,0,0.5); margin-top:-4px; }
+#playBtn { cursor:pointer; font-size:1.2rem; user-select:none; }
+
+#watermark { position: fixed; bottom:10px; left:10px; font-family:'Poppins', sans-serif; font-weight:600; font-size:14px; color:#E3E3E3; opacity:0.7; pointer-events:none; z-index:9999; }
+</style>
+</head>
+<body>
+<video autoplay muted loop id="myVideo">
+  <source src="./assets/ender-2b-nier-automata-wuhd-4k-1440-ytshorts.savetube.me.mp4" type="video/mp4">
+</video>
+<div class="overlay"></div>
+
+<div id="enterOverlay">
+  <span id="enterText">CLICK TO ENTER</span>
+  <div id="privacyText">Policy</div>
+</div>
+
+<div class="container">
+  <h1><b>Stefan</b></h1>
+  <div class="social-buttons">
+    <a href="https://www.instagram.com/stefan73_" target="_blank"><img src="./assets/Instagram_logo_2022.svg.png" alt="Instagram">Instagram</a>
+    <a href="https://www.tiktok.com/@stefan732_" target="_blank"><img src="./assets/4362958_tiktok_logo_social media_icon.png" alt="TikTok">TikTok</a>
+    <a href="https://discord.com/users/813343037199613973" target="_blank"><img src="./assets/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" alt="Discord">Discord</a>
+    <a href="mailto:example@example.com?subject=I need a website!&body=This is a business email." target="_blank"><img src="./assets/advertise.png" alt="Advertise">Need a website ?</a>
+  </div>
+</div>
+
+<div id="privacyPopup">
+  <button class="closeBtn">&times;</button>
+
+  <!-- Butoane schimbare limba -->
+  <div id="langButtons" style="position:absolute; top:10px; left:10px; display:flex; gap:10px; z-index:1010;">
+    <button class="langBtn" data-lang="en" style="width:40px; height:40px; border-radius:50%; border:none; cursor:pointer; background:transparent;">
+      <img src="./assets/united-kingdom.png" alt="EN" style="width:125%; height:100%; border-radius:50%;">
+    </button>
+    <button class="langBtn" data-lang="ro" style="width:40px; height:40px; border-radius:50%; border:none; cursor:pointer; background:transparent;">
+      <img src="./assets/flag.png" alt="RO" style="width:125%; height:100%; border-radius:50%;">
+    </button>
+  </div>
+
+  <div id="privacyContent"></div>
+</div>
+
+<div id="audioPlayer">
+  <img src="./assets/1200x1200bf-60.png" alt="Cover" id="trackCover">
+  <div>
+    <div id="trackTitle"><span>DESTROY LONELY - BANE      •••      DESTROY LONELY - BANE      •••      DESTROY LONELY - BANE</span></div>
+    <input type="range" id="trackSlider" value="0" min="0" max="100">
+  </div>
+  <div id="playBtn">▶</div>
+</div>
+
+<audio id="audio" src="./assets/Bane.mp3" loop></audio>
+
+<div id="watermark">♥ Made by aleks96_</div>
+
+<script>
+const enterOverlay = document.getElementById('enterOverlay');
+const privacyText = document.getElementById('privacyText');
+const privacyPopup = document.getElementById('privacyPopup');
+const closePrivacy = document.querySelector('#privacyPopup .closeBtn');
+const audioPlayer = document.getElementById('audioPlayer');
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('playBtn');
+const trackSlider = document.getElementById('trackSlider');
+const trackSpan = document.querySelector('#trackTitle span');
+const privacyContent = document.getElementById('privacyContent');
+const langButtons = document.querySelectorAll('.langBtn');
+
+
+// Conținut în engleză și română
+const privacyTexts = {
+  en: `
+    <h2>Privacy Policy</h2>
+    <h3>1. Introduction</h3>
+    <p>We respect the privacy of the visitors of this site. The information collected is minimal and serves exclusively technical purposes and the proper functioning of the page.</p>
+    <h3>2. Data Collected</h3>
+    <p>• We do not collect personal data directly.<br>
+    • The site may automatically log technical info such as IP, browser type, cookies for performance and UX improvement.</p>
+    <h3>3. External Services</h3>
+    <p>This site contains links to external platforms (Instagram, YouTube, TikTok, Discord). These platforms may collect data according to their own privacy policies. We recommend consulting them directly on their respective sites.</p>
+    <h3>4. Data Use</h3>
+    <p>Technical data may be used for:<br>- improving performance,<br>- abuse protection,<br>- access statistics.</p>
+    <h3>5. User Rights</h3>
+    <p>Users have the right to request the deletion or rectification of any personal data that has been voluntarily provided through direct contact.</p>
+    <h3>6. Contact</h3>
+    <p>Questions regarding privacy or copyright can be sent to: <b>alekss.inquires@gmail.com</b>.</p>
+    <h3>7. Disclaimer</h3>
+    <p>This site is a personal project and is <b>not affiliated with</b> Instagram, YouTube, TikTok, Discord, or any other mentioned services. All brands and logos belong to their rightful owners.</p>
+  <p>The audio/video materials integrated on the website <b>do not belong to me</b>; the copyrights belong to the artists and original owners. They are used only for demonstrative/personal purposes.</p>
+  <p>I do not take responsibility for the content, practices, or privacy policies of external platforms accessible through the links on the site.</p>
+  `,
+  ro: `
+    <h2>Politica de confidențialitate</h2>
+    <h3>1. Introducere</h3>
+    <p>Respectăm confidențialitatea vizitatorilor acestui site. Informațiile colectate sunt minime și au rol exclusiv tehnic și de funcționare corectă a paginii.</p>
+    <h3>2. Date colectate</h3>
+    <p>• Nu colectăm date personale direct.<br>
+    • Site-ul poate înregistra automat informații tehnice precum adresa IP, tipul de browser și cookie-uri, pentru funcționarea corectă și îmbunătățirea experienței utilizatorului.</p>
+    <h3>3. Servicii externe</h3>
+    <p>Acest site conține linkuri către platforme externe (Instagram, YouTube, TikTok, Discord). Aceste platforme pot colecta date conform propriilor politici de confidențialitate. Recomandăm consultarea acestora direct pe site-urile respective.</p>
+    <h3>4. Utilizarea datelor</h3>
+    <p>Datele tehnice pot fi folosite pentru:<br>- îmbunătățirea performanței site-ului,<br>- protecție împotriva abuzurilor,<br>- statistici de acces.</p>
+    <h3>5. Drepturile utilizatorilor</h3>
+    <p>Utilizatorii au dreptul să solicite ștergerea sau rectificarea oricăror date personale care au fost oferite voluntar prin contact direct.</p>
+    <h3>6. Contact</h3>
+    <p>Pentru întrebări legate de confidențialitate sau drepturi de autor, mă puteți contacta la: <b>alekss.inquires@gmail.com</b>.</p>
+    <h3>7. Disclaimer</h3>
+  <p>Acest site este un proiect personal și <b>nu este afiliat</b> cu Instagram, YouTube, TikTok, Discord sau alte servicii menționate. Toate mărcile și logourile aparțin proprietarilor lor de drept.</p>
+  <p>Materialele audio/video integrate pe site <b>nu îmi aparțin</b>; drepturile de autor aparțin artiștilor și proprietarilor originali. Acestea sunt folosite doar în scop demonstrativ/personal.</p>
+  <p>Nu îmi asum responsabilitatea pentru conținutul, practicile sau politicile de confidențialitate ale platformelor externe accesibile prin linkurile prezente pe site.</p>
+  `
+};
+
+// Setare limbă default EN
+privacyContent.innerHTML = privacyTexts.en;
+
+// Schimbare limbă la click
+langButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const lang = btn.dataset.lang;
+    privacyContent.innerHTML = privacyTexts[lang];
+  });
+});
+
+// Privacy popup
+privacyText.addEventListener('click', e=>{
+  e.stopPropagation();
+  privacyPopup.classList.add('show');
+  privacyText.style.display = 'none';
+});
+closePrivacy.addEventListener('click', ()=>{
+  privacyPopup.classList.remove('show');
+  privacyText.style.display = 'block';
+});
+document.addEventListener('click', (e) => {
+  if (privacyPopup.classList.contains('show') && !privacyPopup.contains(e.target) && e.target !== privacyText) {
+    privacyPopup.classList.remove('show');
+    privacyText.style.display = 'block';
+  }
+});
+
+// Enter overlay click
+enterOverlay.addEventListener('click', ()=>{
+  if(!privacyPopup.classList.contains('show')){
+    enterOverlay.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    enterOverlay.style.opacity = '0';
+    enterOverlay.style.transform = 'scale(1.2)';
+    setTimeout(()=>{ enterOverlay.style.display='none'; },800);
+
+    audioPlayer.style.display='flex';
+    audio.play();
+    playBtn.textContent='⏸';
+    trackSpan.style.animationPlayState='running';
+  }
+});
+
+// Audio player controls
+playBtn.addEventListener('click', ()=>{
+  if(audio.paused){ audio.play(); playBtn.textContent='⏸'; trackSpan.style.animationPlayState='running'; }
+  else { audio.pause(); playBtn.textContent='▶'; trackSpan.style.animationPlayState='paused'; }
+});
+audio.addEventListener('timeupdate', ()=>{ trackSlider.value=(audio.currentTime/audio.duration)*100; });
+trackSlider.addEventListener('input', ()=>{ audio.currentTime=(trackSlider.value/100)*audio.duration; });
+audio.addEventListener('ended', ()=>{ audio.currentTime=0; audio.play(); playBtn.textContent='⏸'; trackSpan.style.animationPlayState='running'; });
+
+// Animate title in tab
+const titleBase = "@"; const titleText = "Stefan"; let index=0; let forward=true;
+function animateTitle(){
+  if(forward){ index++; if(index>titleText.length){ forward=false; setTimeout(animateTitle,1000); return; } }
+  else { index--; if(index<0){ forward=true; setTimeout(animateTitle,500); return; } }
+  document.title = titleBase+titleText.substring(0,index);
+  setTimeout(animateTitle,250);
+}
+animateTitle();
+</script>
+</body>
+</html>
